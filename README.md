@@ -127,9 +127,16 @@ Reactive API
      * Functional Endpoints
         * 람다 베이스, 가볍고, 함수형 프로그래밍 모델
         * route와 handle request를 사용
+
 성능    
 * Reactive그리고 non-blocking은 일반적으로 어플리케이션을 더 빠르게 만들지는 않습니다.
+   * 몇몇 케이스들에 대해서, WebClient를 활용해서 병렬 원격 호출하는 케이스
+* non-blocking 작업을 위해 처리시간이 더 늘어날수 있습니다.
+* reactive non-blocking에서 기대하는 주요한 부분은 적은수의 스레드와 적은 메모리를 통한 확장성이며, 부하에 대해 탄력적으로 대응할 수 있습니다.
 
-    
+병렬 모델
+* Spring MVC는 기본적으로 스레드가 blocking 될수 있다는 것을 가정합니다. 때문에 큰 스레드풀을 활용합니다.
+* Spring WebFlux는 스레드가 non-blocking인것을 가정합니다, 때문에 작은 고정크기 스레드풀(이벤트 루프 워커)를 사용해서 처리합니다
+
 
 
