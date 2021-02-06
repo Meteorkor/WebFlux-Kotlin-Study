@@ -111,7 +111,16 @@ Define "Reactive"
         
         4. 
 
-      
+Reactive API
+* 너무 저수준의 API들은 개발 API로는 유용하게 사용하기 어렵기 때문에, Reactive Streams는 중요한 역할을 합니다.
+* Reactive Streams는 Java8의 Stream API와 비슷하지만 collection에만 해당하지 않고 Reactive 로직을 작성하는데 편의성을 제공합니다.
+* Reactor는 Spring WebFlux에서 선택한 Reactive 라이브러리입니다.
+* Reactor는 Mono와 Flux API들을 통해 풍부한 연산자들을 제공합니다.
+* Reactor는 Reactive Streams 라이브러리이며, 모든 연산자들은 non-blocking back pressure를 지원합니다.
+* Reactor를 코어로 의존하고 있지만, 다른 리액티브 라이브러리를 활용할 수 있다.
+
+
+    
     
 
 
