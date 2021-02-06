@@ -119,8 +119,17 @@ Reactive API
 * Reactor는 Reactive Streams 라이브러리이며, 모든 연산자들은 non-blocking back pressure를 지원합니다.
 * Reactor를 코어로 의존하고 있지만, 다른 리액티브 라이브러리를 활용할 수 있다.
 
+개발 모델
+* spring-web 모듈은 reactive의 기반을 포함하고 있다, Http 추상화, Reactive Streams adapters, 코덱, 웹핸들러 API 등
+  * Spring WebFlux 개발 모델 두가지
+     * Controller
+        * Spring MVC와 동일한 어노테이션 기반으로 작성, reactive return type 제공
+     * Functional Endpoints
+        * 람다 베이스, 가볍고, 함수형 프로그래밍 모델
+        * route와 handle request를 사용
+성능    
+* Reactive그리고 non-blocking은 일반적으로 어플리케이션을 더 빠르게 만들지는 않습니다.
 
-    
     
 
 
