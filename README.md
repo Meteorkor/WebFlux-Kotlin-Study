@@ -49,7 +49,7 @@ Define "Reactive"
 
         ```
         1. Publishers는 Subscriber가 request 한 데이터 보다 많은 신호를 발생시킬수 없다.
-        2. Publisher는 요청보다 더 적은 onNext를 발생시킬수 있고, Subscription의 onComplete나 onError에 종료될 수 있습니다.
+        2. Publisher는 요청보다 더 적은 onNext 신호를 발생시킬수 있고, Subscription의 onComplete나 onError 신호에 종료될 수 있습니다.
         3. onSubscribe, onNext, onError 와 onComplete 신호는 순차적으로 이뤄져야한다.
            * 멀티 쓰레드 환경에서도 지켜져야한다.
         4. Publisher의 실패는 onError를 통해 시그널 보내야 한다.
@@ -73,6 +73,28 @@ Define "Reactive"
         }
 
         ```
+        1. Subscriber는 반드시 Subscription.request(n)을 통해 데이터 요청 신호를 보내야 합니다, onNext신호를 받기위해서
+           * 이 방법을 통해 수신자는 요청하는 수와 시기를 조절할 수 있습니다, 다만 하나씩만 요청하게된다면 비효율적인 중지 및 대기 가 발생할 수 있으니 상한선을 요청하는 것이 좋습니다.
+        2. Subscriber의 처리가 Publisher가 응답하는것에 영향을 주는경우 async하게 처리할수 있도록 하는것이 좋습니다.
+           * Publisher가 cpu 스케줄을 받지 못하는일이 없도록 함 입니다.
+        3. Subscriber의 onComplete()나 onError(t)는 Publisher나 SubScription의 메소드를 호출하면 안됩니다.
+           * 완료처리(onComplete, onError)하는 동안에 재귀호출을 방지하고, 타이밍 이슈를 방지하기 위함
+        4. Subscriber의 onComplete()나 onError(t)는 Subscription의 cancelled를 고려해야합니다.
+           * Publisher의 최종 상태를 따르도록 함 입니다.
+        5. Subscriber는 onSubscribe에서 전달받은 Subscription의 Subscription.cancel()을 호출해야한다
+           * 같은 Subscriber를 통해 여러개의 Publisher들에 접근하는것을 예방하지 위해, 리소스릭을 방지하고 Subscription을 취소하기 위해
+        6. Subscriber는 Subscription이 더이상 필요하지 않을때 Subscription.cancel()을 호출해야한다
+        7. Subscriber는 Subscription의 request()와 cancel()의 순차적인 호출에 대해 보장해야한다.
+           * 멀티쓰레드 환경이라도 보장해야한다.
+        8. Subscriber는 Subscription.cancel()이후에도 하나 혹은 여러번의 onNext 신호를 받을 준비를 해야한다, Subscription.cancel()은 즉시 중지하는것을 보장할 수 없기 때문에 onNext가 발생 할 수 있다.
+        9. Subscriber는 Subscription.request(n)이 호출되기 전에 onComplete()시그널이 올수 있음을 준비해야한다.
+        10. Subscriber는 Subscription.request(n)이 호출되기 전에 onError()시그널이 올수 있음을 준비해야한다.
+        11. Subscriber는 신호들을 처리하기 전에 모든 신호들이 정상동작하는지 보장해야합니다.
+            * 신호의 비동기 처리가 스레드 환경에서 안전한지를 보장하고자
+        12. Subscriber.onSubscribe는 반드시 한번만 호출되어야 합니다.
+        13. onSubscribe, onNext, onError, onComplete는 반드시 정상적으로 리턴되어야하며, expcetion은 파라미터가 null일경우에 던져야합니다. 다른 모든 상황들에서 Subscription.cancel만이 정상적인 취소 방법입니다.
+        
+        
       * Subscription
         ```java
         public interface Subscription {
