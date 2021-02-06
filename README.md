@@ -103,7 +103,14 @@ Define "Reactive"
         }
 
         ```
-      
+        1. Subscription.reqeust, Subscription.cancel 은 반드시 Subscriber에서만 불려야 한다.
+            * Subscription은 Subsciber와 Publisher의 유일한 관계를 나타내며, Subscriber는 Subscription을 통해 데이터가 더 필요하고, 필요 없음을 제어한다.
+        2. Subscription의 Subscription.request는 Subscriber의 onNext 혹은 onSubscribe에서만 sync로 호출되어야 한다.
+            *  이것은 재귀호출시 stackoverflow를 피하기 위해서
+        3. Subscription.reqeust는 가능한 Publisher와 Subscriber 사이의 재귀호출 윗부분에 호출될수 있도록 한다.(??)
+        
+        4. 
+
       
     
 
