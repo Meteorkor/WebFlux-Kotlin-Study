@@ -51,15 +51,15 @@ Define "Reactive"
         1. Publishers는 Subscriber가 request 한 데이터 보다 많은 신호를 발생시킬수 없다.
         2. Publisher는 요청보다 더 적은 onNext를 발생시킬수 있고, Subscription의 onComplete나 onError에 종료될 수 있습니다.
         3. onSubscribe, onNext, onError 와 onComplete 신호는 순차적으로 이뤄져야한다.
-          * 멀티 쓰레드 환경에서도 지켜져야한다.
+           * 멀티 쓰레드 환경에서도 지켜져야한다.
         4. Publisher의 실패는 onError를 통해 시그널 보내야 한다.
         5. Publisher의 정상적인 종료는 반드시 onComplete 를 사용한다.
         6. Publisher가 onError 혹은 onComplete를 시그널 하면, Subscriber는 Subscription에 cancelled를 고려해야한다.
         7. 한번 종료 상태(onError, onComplete)가 되면, 더이상 시그널을 발생시키지 않는다.
         8. Subscription이 cancelled되면, Subscriber는 반드시 결국에는 시그널을 멈춰야한다.
         9. Publisher.subscribe는 반드시 Subscriber의 onSubscribe를 호출해야하며, 정상적으로 리턴해야 한다.
-          * Subscriber가 null일 경우에는 NullPointerException을 던진다.
-          * onSubscribe는 최대 한번만 호출되어야합니다.
+           * Subscriber가 null일 경우에는 NullPointerException을 던진다.
+           * onSubscribe는 최대 한번만 호출되어야합니다.
         10. Publisher.subscribe는 원하면 여러번 호출될수 있지만, 반드시 다른 Subscriber를 통해 호출해야합니다.
         11. Publisher는 여러개의 Subsciber를 지원할 수 있고, Subscription이 unicast인지 multicast인지에 따라 결정됩니다.
         
