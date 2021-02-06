@@ -39,5 +39,34 @@ Define "Reactive"
       * NOP : 호출한 스레드에 영향을 감지 할수 없는 실행, 여러번 실행하더라도 안전하다
       * Serial(ly) : Signal 관점에서, 덮어쓰여지지 않으며, JVM 관점에서는 호출간에 관계가 있는 경으에는 순차적으로 호출되며, 비동기적으로 수행될때에는 락 혹은 atomic 연산을 통해 순차적임을 제공
       * Thread-safe : 정확성을 보장하기 위해 외부 동기화 없이 안전하게 동기 혹은 비동기 방식 제공
+    * 구성 상세
+      * Publisher
+        ```java
+        public interface Publisher<T> {
+          public void subscribe(Subscriber<? super T> s);
+        }
+
+        ```
+      * Subscriber
+        ```java
+        public interface Subscriber<T> {
+            public void onSubscribe(Subscription s);
+            public void onNext(T t);
+            public void onError(Throwable t);
+            public void onComplete();
+        }
+
+        ```
+      * Subscription
+        ```java
+        public interface Subscription {
+            public void request(long n);
+            public void cancel();
+        }
+
+        ```
+      
+      
+    
 
 
