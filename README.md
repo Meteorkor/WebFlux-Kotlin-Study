@@ -2,8 +2,8 @@
 
 Why was Spring WebFlux created?
 * 적은 스레드 적은 리소스를 통한 병렬처리
-  * Servlet3.1부터 non-blockingI/O를 제공했지만, 여전히 sync동작(Filter, Servelet)과 blocking(getParameter, getPart) 방식을 사용하고 있기 때문
-  * 새로운 API가 잘구축된 non-blocking runtime에 필요로 했고, non-blocking, async를 구현한 서버(Netty)가 중요해졌음
+  * Servlet3.1부터 non-blockingI/O를 제공했지만, 여전히 sync동작(Filter, Servelet)과 blocking(getParameter, getPart) 방식을 사용하고 있었고
+  * 잘구축된 non-blocking runtime을 위해 새로운 API를 필요로 했고, non-blocking, async를 구현한 서버(Netty)가 중요해졌음
 * 함수형 프로그래밍
   * 람다가 Java8에 추가되며 자바에 함수형 프로그래밍의 기회가 만들어졌다.
   * non-blocking 어플리케이션과 연속적인 API 스타일들
