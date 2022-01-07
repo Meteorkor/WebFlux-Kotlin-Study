@@ -70,7 +70,43 @@ class MonoFromTest {
         Assertions.assertThat(callCnt.toInt()).isEqualTo(1)
     }
 
-    //fromRunnable
+    @Test
+    internal fun fromRunnableTest() {
+        val callCnt = AtomicInteger()
+        val syncCheck = CountDownLatch(1)
+        val runnable = Runnable {
+            callCnt.set(1)
+            syncCheck.countDown()
+        }
 
-    //fromSupplier
+        Assertions.assertThat(syncCheck.await(1, TimeUnit.SECONDS)).isEqualTo(false)
+        Assertions.assertThat(callCnt.toInt()).isEqualTo(0)
+
+        val fromCompletionStage = Mono.fromRunnable<String>(runnable)
+        Assertions.assertThat(fromCompletionStage.block()).isNull()
+        Assertions.assertThat(syncCheck.await(1, TimeUnit.SECONDS)).isEqualTo(true)
+        Assertions.assertThat(callCnt.toInt()).isEqualTo(1)
+        Assertions.assertThat(callCnt.toInt()).isEqualTo(1)
+    }
+
+    @Test
+    internal fun fromSupplierTest() {
+        val text = "Hello"
+        val callCnt = AtomicInteger()
+        val syncCheck = CountDownLatch(1)
+        val supplier = {
+            callCnt.set(1)
+            syncCheck.countDown()
+            text
+        }
+
+        Assertions.assertThat(syncCheck.await(1, TimeUnit.SECONDS)).isEqualTo(false)
+        Assertions.assertThat(callCnt.toInt()).isEqualTo(0)
+
+        val fromCompletionStage = Mono.fromSupplier(supplier)
+        Assertions.assertThat(fromCompletionStage.block()).isEqualTo(text)
+        Assertions.assertThat(syncCheck.await(1, TimeUnit.SECONDS)).isEqualTo(true)
+        Assertions.assertThat(callCnt.toInt()).isEqualTo(1)
+        Assertions.assertThat(callCnt.toInt()).isEqualTo(1)
+    }
 }
