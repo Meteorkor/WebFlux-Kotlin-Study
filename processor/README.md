@@ -39,6 +39,8 @@
     * blockOptional
   * cast
   * cache
+    * cacheInvalidateIf
+    * cacheInvalidateWhen 
   * cacelOn
   * checkpoint
   * concatWith
