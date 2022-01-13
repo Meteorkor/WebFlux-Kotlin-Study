@@ -5,6 +5,7 @@ import org.assertj.core.util.Lists
 import org.junit.jupiter.api.Test
 import org.springframework.util.concurrent.SettableListenableFuture
 import reactor.core.publisher.Mono
+import reactor.test.StepVerifier
 
 class MonoAsCastTest {
     @Test
@@ -57,7 +58,10 @@ class MonoAsCastTest {
             .and(Mono.fromCallable {
                 future.set(text)
                 text
-            }).block()
+            })
+
+        StepVerifier.create(block)
+            .verifyComplete()
         Assertions.assertThat(future.isDone).isTrue
         Assertions.assertThat(block).isNotEqualTo(text)
     }
@@ -86,9 +90,12 @@ class MonoAsCastTest {
                 future.set(text)
                 switchText
             }
-            .block()
+
+        StepVerifier.create(block)
+            .expectNext(switchText)
+            .verifyComplete()
+
         Assertions.assertThat(future.isDone).isTrue
-        Assertions.assertThat(block).isEqualTo(switchText)
     }
 
     @Test
@@ -102,8 +109,12 @@ class MonoAsCastTest {
                 future.set(text)
                 switchText
             }.onErrorReturn(switchText)
-            .block()
+
+        StepVerifier.create(block)
+            .expectNext(switchText)
+            .expectComplete()
+            .verify()
+
         Assertions.assertThat(future.isDone).isFalse
-        Assertions.assertThat(block).isEqualTo(switchText)
     }
 }
