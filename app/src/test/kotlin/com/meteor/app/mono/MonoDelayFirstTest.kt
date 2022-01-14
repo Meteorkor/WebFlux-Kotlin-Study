@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.util.StopWatch
 import reactor.core.publisher.Mono
+import reactor.test.StepVerifier
 import java.time.Duration
 
 class MonoDelayFirstTest {
@@ -16,7 +17,9 @@ class MonoDelayFirstTest {
             println("it : ${it}")
             it
         }
-        delayMono.block()
+        StepVerifier.create(delayMono)
+            .expectNext(0)
+            .verifyComplete()
         stopWatch.stop()
         Assertions.assertThat(stopWatch.totalTimeSeconds).isGreaterThan(1.0)
     }
@@ -31,10 +34,8 @@ class MonoDelayFirstTest {
         val mono2 = Mono.delay(Duration.ofMillis(d_300)).map { d_300 }
         val mono3 = Mono.delay(Duration.ofMillis(d_700)).map { d_700 }
 
-        Assertions.assertThatThrownBy {
-            Mono.firstWithSignal(errorMono, mono1, mono2, mono3).block()
-        }
-//        Assertions.assertThat(block).isEqualTo(d_100)
+        StepVerifier.create(Mono.firstWithSignal(errorMono, mono1, mono2, mono3))
+            .expectError()
     }
 
     @Test
@@ -49,6 +50,9 @@ class MonoDelayFirstTest {
 
         //ignore error signal
         val block = Mono.firstWithValue(errorMono, mono1, mono2, mono3).block()
-        Assertions.assertThat(block).isEqualTo(d_100)
+
+        StepVerifier.create(Mono.firstWithValue(errorMono, mono1, mono2, mono3))
+            .expectNext(d_100)
+            .verifyComplete()
     }
 }

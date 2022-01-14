@@ -1,9 +1,9 @@
 package com.meteor.app.mono
 
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.test.StepVerifier
 
 class MonoEtcTest {
     @Test
@@ -12,7 +12,8 @@ class MonoEtcTest {
         val ignoreElement = Mono.just(text)
             .ignoreElement()//emptyMono
 
-        Assertions.assertThat(ignoreElement.block()).isNull()
+        StepVerifier.create(ignoreElement)
+            .verifyComplete()
     }
 
     @Test
@@ -22,7 +23,9 @@ class MonoEtcTest {
         val mono2 = Mono.just(text)
 
         val sequenceEqualMono = Mono.sequenceEqual(mono1, mono2)
-        Assertions.assertThat(sequenceEqualMono.block()).isEqualTo(true)
+        StepVerifier.create(sequenceEqualMono)
+            .expectNext(true)
+            .verifyComplete()
     }
 
     @Test
@@ -32,7 +35,9 @@ class MonoEtcTest {
         val mono2 = Mono.empty<String>()
 
         val sequenceEqualMono = Mono.sequenceEqual(mono1, mono2)
-        Assertions.assertThat(sequenceEqualMono.block()).isEqualTo(false)
+        StepVerifier.create(sequenceEqualMono)
+            .expectNext(false)
+            .verifyComplete()
     }
 
     @Test
@@ -42,7 +47,9 @@ class MonoEtcTest {
         val mono2 = Mono.empty<String>()
 
         val sequenceEqualMono = Mono.sequenceEqual(mono1, mono2)
-        Assertions.assertThat(sequenceEqualMono.block()).isEqualTo(true)
+        StepVerifier.create(sequenceEqualMono)
+            .expectNext(true)
+            .verifyComplete()
     }
 
     @Test
@@ -52,7 +59,9 @@ class MonoEtcTest {
         val flux2 = Flux.empty<String>()
 
         val sequenceEqualMono = Mono.sequenceEqual(flux1, flux2)
-        Assertions.assertThat(sequenceEqualMono.block()).isEqualTo(true)
+        StepVerifier.create(sequenceEqualMono)
+            .expectNext(true)
+            .verifyComplete()
     }
 
     @Test
@@ -62,7 +71,9 @@ class MonoEtcTest {
         val flux2 = Flux.just("a", "b", "c")
 
         val sequenceEqualMono = Mono.sequenceEqual(flux1, flux2)
-        Assertions.assertThat(sequenceEqualMono.block()).isEqualTo(true)
+        StepVerifier.create(sequenceEqualMono)
+            .expectNext(true)
+            .verifyComplete()
     }
 
     @Test
@@ -72,7 +83,9 @@ class MonoEtcTest {
         val flux2 = Flux.just("a", "b")
 
         val sequenceEqualMono = Mono.sequenceEqual(flux1, flux2)
-        Assertions.assertThat(sequenceEqualMono.block()).isEqualTo(false)
+        StepVerifier.create(sequenceEqualMono)
+            .expectNext(false)
+            .verifyComplete()
     }
 
     @Test
@@ -82,6 +95,8 @@ class MonoEtcTest {
         val mono1 = Mono.just("a")
 
         val sequenceEqualMono = Mono.sequenceEqual(flux1, mono1)
-        Assertions.assertThat(sequenceEqualMono.block()).isEqualTo(true)
+        StepVerifier.create(sequenceEqualMono)
+            .expectNext(true)
+            .verifyComplete()
     }
 }

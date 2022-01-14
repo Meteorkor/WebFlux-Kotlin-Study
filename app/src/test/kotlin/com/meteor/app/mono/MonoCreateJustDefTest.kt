@@ -3,6 +3,7 @@ package com.meteor.app.mono
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Mono
+import reactor.test.StepVerifier
 import javax.management.InvalidAttributeValueException
 
 class MonoCreateJustDefTest {
@@ -41,7 +42,10 @@ class MonoCreateJustDefTest {
     internal fun justMono() {
         val justValue = "hello"
         val just = Mono.just(justValue)
-        Assertions.assertThat(just.block()).isEqualTo(justValue)
+
+        StepVerifier.create(just)
+            .expectNext(justValue)
+            .verifyComplete()
     }
 
     @Test
@@ -49,8 +53,9 @@ class MonoCreateJustDefTest {
         val str = "Hello"
         val createdMono = Mono.just(str)
 
-        val block = Mono.defer { createdMono }.block()
-        Assertions.assertThat(block).isEqualTo(str)
+        StepVerifier.create(Mono.defer { createdMono })
+            .expectNext(str)
+            .verifyComplete()
     }
 
 
