@@ -41,6 +41,8 @@ dependencies {
 	}
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.springframework.restdocs:spring-restdocs-webtestclient")
+	testImplementation("com.squareup.okhttp3:okhttp")
+	testImplementation("com.squareup.okhttp3:mockwebserver")
 }
 
 tasks.withType<KotlinCompile> {
