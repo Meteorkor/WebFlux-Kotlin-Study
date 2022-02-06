@@ -3,6 +3,7 @@ package com.meteor.app.mono
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Mono
+import reactor.test.StepVerifier
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -19,7 +20,9 @@ class MonoFromTest {
         }
         val fromCallable = Mono.fromCallable(callable)
         Assertions.assertThat(callCnt.toInt()).isEqualTo(0)
-        Assertions.assertThat(fromCallable.block()).isEqualTo(text)
+        StepVerifier.create(fromCallable)
+            .expectNext(text)
+            .verifyComplete()
         Assertions.assertThat(callCnt.toInt()).isEqualTo(1)
     }
 
@@ -38,7 +41,9 @@ class MonoFromTest {
         Assertions.assertThat(callCnt.toInt()).isEqualTo(1)
 
         val fromCompletionStage = Mono.fromCompletionStage(minimalCompletionStage)
-        Assertions.assertThat(fromCompletionStage.block()).isEqualTo(text)
+        StepVerifier.create(fromCompletionStage)
+            .expectNext(text)
+            .verifyComplete()
         Assertions.assertThat(callCnt.toInt()).isEqualTo(1)
     }
 
@@ -47,8 +52,12 @@ class MonoFromTest {
         val text = "Hello"
         val fromDirect = Mono.fromDirect<String> {
             it.onNext(text)
+            it.onComplete()
         }
         Assertions.assertThat(fromDirect.block()).isEqualTo(text)
+//        StepVerifier.create(fromDirect)
+//            .expectNext(text)
+//            .verifyComplete()
     }
 
     @Test
@@ -66,7 +75,9 @@ class MonoFromTest {
         Assertions.assertThat(callCnt.toInt()).isEqualTo(1)
 
         val fromCompletionStage = Mono.fromFuture(minimalCompletionStage)
-        Assertions.assertThat(fromCompletionStage.block()).isEqualTo(text)
+        StepVerifier.create(fromCompletionStage)
+            .expectNext(text)
+            .verifyComplete()
         Assertions.assertThat(callCnt.toInt()).isEqualTo(1)
     }
 
@@ -83,7 +94,8 @@ class MonoFromTest {
         Assertions.assertThat(callCnt.toInt()).isEqualTo(0)
 
         val fromCompletionStage = Mono.fromRunnable<String>(runnable)
-        Assertions.assertThat(fromCompletionStage.block()).isNull()
+        StepVerifier.create(fromCompletionStage)
+            .verifyComplete()
         Assertions.assertThat(syncCheck.await(1, TimeUnit.SECONDS)).isEqualTo(true)
         Assertions.assertThat(callCnt.toInt()).isEqualTo(1)
         Assertions.assertThat(callCnt.toInt()).isEqualTo(1)
@@ -104,7 +116,9 @@ class MonoFromTest {
         Assertions.assertThat(callCnt.toInt()).isEqualTo(0)
 
         val fromCompletionStage = Mono.fromSupplier(supplier)
-        Assertions.assertThat(fromCompletionStage.block()).isEqualTo(text)
+        StepVerifier.create(fromCompletionStage)
+            .expectNext(text)
+            .verifyComplete()
         Assertions.assertThat(syncCheck.await(1, TimeUnit.SECONDS)).isEqualTo(true)
         Assertions.assertThat(callCnt.toInt()).isEqualTo(1)
         Assertions.assertThat(callCnt.toInt()).isEqualTo(1)

@@ -124,5 +124,28 @@
   * zipWith 
 
 
-
-## Flux
+## Flux - Static Generators
+* create
+* defer
+    * deferContextual
+* empty
+* error
+* first
+    * firstWithSignal
+    * firstWithValue
+* from
+    * fromArray
+    * fromIterable
+    * fromStream
+* just
+* never
+* mergeSequential
+* using
+    * usingWhen
+* zip
+* combineLatest
+* concat
+* range
+* generate
+* push
+* switchNext
