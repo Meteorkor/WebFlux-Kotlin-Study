@@ -14,6 +14,9 @@ import javax.persistence.OneToOne
 Required identifier property
 @Id를 설정하지 않으면 findById시 위 에러가 발생
 
+3.
+@OneToOne 도 동작하지 않음
+
  */
 
 

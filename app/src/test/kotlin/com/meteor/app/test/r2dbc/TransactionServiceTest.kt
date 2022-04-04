@@ -1,4 +1,4 @@
-package com.meteor.app
+package com.meteor.app.test.r2dbc
 
 import com.meteor.app.r2dbc.domain.user.Item
 import com.meteor.app.r2dbc.domain.user.User
