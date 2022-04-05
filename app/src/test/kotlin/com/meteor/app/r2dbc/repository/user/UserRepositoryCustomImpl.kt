@@ -35,7 +35,5 @@ class UserRepositoryCustomImpl(val databaseClient: DatabaseClient) : UserReposit
 
             User(userId, name, userInfo)
         }
-
-//        r2dbcEntityTemplate.select(User::class.java).matching(w)
     }
 }

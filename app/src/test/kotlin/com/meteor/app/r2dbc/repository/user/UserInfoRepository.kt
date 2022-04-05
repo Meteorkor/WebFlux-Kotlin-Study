@@ -1,11 +1,11 @@
 package com.meteor.app.r2dbc.repository.user
 
-import com.meteor.app.r2dbc.domain.user.User
+import com.meteor.app.r2dbc.domain.user.UserInfo
 import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import reactor.core.publisher.Mono
 
-interface UserInfoRepository : ReactiveCrudRepository<User, String> {
+interface UserInfoRepository : ReactiveCrudRepository<UserInfo, Long> {
 //    @Query(
 //        value = """
 //      insert into User(userId, name)
@@ -17,8 +17,8 @@ interface UserInfoRepository : ReactiveCrudRepository<User, String> {
     @Query(
         value = """
       insert into UserInfo(userId, info)
-      values (:#{#user.userId}, :#{info})
+      values (:#{#userInfo.userId}, :#{#userInfo.info})
       """
     )
-    fun insert(user: User, info: String): Mono<User>
+    fun insert(userInfo: UserInfo): Mono<Void>
 }

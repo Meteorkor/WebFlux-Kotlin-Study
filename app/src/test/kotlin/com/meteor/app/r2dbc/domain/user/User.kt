@@ -1,8 +1,8 @@
 package com.meteor.app.r2dbc.domain.user
 
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.Transient
 import org.springframework.data.relational.core.mapping.Table
-import javax.persistence.OneToOne
 
 /*
 1.
@@ -17,13 +17,16 @@ Required identifier property
 3.
 @OneToOne 도 동작하지 않음
 
+4.
+Repository.save 시 innerEntity가 있으면 에러발생
+@Transient를 추가해서 save 대상에서 제외
+
  */
 
 
 @Table
 data class User(
-    @Id val userId: String, val name: String,
-    @OneToOne(mappedBy = "userId")
-    val userInfo: UserInfo? = null
+    @Id val userId: String, var name: String,
+    @Transient val userInfo: UserInfo? = null
 ) {
 }

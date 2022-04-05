@@ -13,7 +13,7 @@ interface UserRepository : ReactiveCrudRepository<User, String>, UserRepositoryC
       values (:#{#user.userId}, :#{#user.name})
       """
     )
-    fun insert(user: User): Mono<User>
+    fun insert(user: User): Mono<Void>
 
 //    @Query(
 //        value = """

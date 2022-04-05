@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono
 @Service
 class UserService(val userRepository: UserRepository) {
     @Transactional
-    fun insertUser(user: User): Mono<User> {
-        return userRepository.insert(user);
+    fun insertUser(user: User): Mono<Void> {
+        return userRepository.insert(user)
     }
 }
