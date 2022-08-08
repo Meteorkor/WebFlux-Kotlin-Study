@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.test.util.ReflectionTestUtils
 import reactor.core.publisher.Flux
+import reactor.core.scheduler.Schedulers
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.StandardOpenOption
@@ -103,6 +104,84 @@ class FilePubSubTest {
             return fileChannelClosed;
         }
         return true;
+    }
+
+    @Test
+    internal fun fileSimpleLineSubscriberTest() {
+        val file = File.createTempFile("pre", "suf")
+        file.deleteOnExit()
+
+        val fileContentSample = Lists.list("a", "b", "c")
+        Files.write(file.toPath(), fileContentSample, StandardOpenOption.CREATE)
+
+        val newBufferedWriter = Files.newBufferedWriter(file.toPath(), StandardOpenOption.CREATE)
+
+        Flux.fromIterable(fileContentSample)
+            .subscribe(
+                {
+                    newBufferedWriter.write(it)
+                    newBufferedWriter.newLine()
+                },
+                { newBufferedWriter.close() },
+                { newBufferedWriter.close() }
+            )
+
+
+        val fileStream = Files.lines(file.toPath())
+        val iterator: Iterator<String> = fileContentSample.iterator()
+
+        val fileSimpleLinePublisher = Flux.using(
+            { fileStream },
+            { Flux.fromStream(it) },
+            Stream<String>::close
+        ).doOnNext {
+            Assertions.assertEquals(
+                iterator.next(),
+                it
+            )
+        }
+
+        fileSimpleLinePublisher.blockLast()
+    }
+
+
+    @Test
+    internal fun fileSimpleLineSubscriberOnTest() {
+        val file = File.createTempFile("pre", "suf")
+        file.deleteOnExit()
+
+        val fileContentSample = Lists.list("a", "b", "c")
+        Files.write(file.toPath(), fileContentSample, StandardOpenOption.CREATE)
+
+        val newBufferedWriter = Files.newBufferedWriter(file.toPath(), StandardOpenOption.CREATE)
+
+        Flux.fromIterable(fileContentSample)
+            .subscribeOn(Schedulers.boundedElastic())
+            .subscribe(
+                {
+                    newBufferedWriter.write(it)
+                    newBufferedWriter.newLine()
+                },
+                { newBufferedWriter.close() },
+                { newBufferedWriter.close() }
+            )
+
+
+        val fileStream = Files.lines(file.toPath())
+        val iterator: Iterator<String> = fileContentSample.iterator()
+
+        val fileSimpleLinePublisher = Flux.using(
+            { fileStream },
+            { Flux.fromStream(it) },
+            Stream<String>::close
+        ).doOnNext {
+            Assertions.assertEquals(
+                iterator.next(),
+                it
+            )
+        }
+
+        fileSimpleLinePublisher.blockLast()
     }
 
 }
