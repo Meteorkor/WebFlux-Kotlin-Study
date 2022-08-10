@@ -62,7 +62,7 @@ class RateLimiterTest {
             .forEach {
                 val sw = StopWatch()
                 sw.start()
-                //1tps로 제한되어서 확보될때까지 대기
+                //10tps로 제한되어서 확보될때까지 대기(100ms)
                 rateLimiter.acquirePermission(permits)
                 sw.stop()
 
