@@ -1,6 +1,7 @@
 package com.meteor.app.mono.operator
 
 import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
@@ -63,4 +64,31 @@ class MonoRetryTest {
         Assertions.assertThat(atomicInteger.get()).isEqualTo(retryCnt.toInt() + 1)
     }
     //.retryRandomBackoff()
+
+    @DisplayName("에러 발생시 특정 로직을 처리하고 다시 retry")
+    @Test
+    internal fun retryProcess() {
+        val num = 3
+        val retryCnt = 5L
+        val retryCntCheck = AtomicInteger()
+        val onErrorResumeCnt = AtomicInteger()
+        val retryMono = Mono.just(num)
+            .map {
+                retryCntCheck.incrementAndGet()
+                throw RuntimeException()
+                it
+            }.onErrorResume { th ->
+                Mono.defer {
+                    Mono.just(onErrorResumeCnt.incrementAndGet())
+                }.flatMap { Mono.error(th) }
+            }
+            .retry(retryCnt)//retryCnt
+//            .onErrorResume()
+
+        StepVerifier.create(retryMono)
+            .verifyError()
+
+        Assertions.assertThat(retryCntCheck.get()).isEqualTo(retryCnt.toInt() + 1)
+        Assertions.assertThat(onErrorResumeCnt.get()).isEqualTo(retryCnt.toInt() + 1)
+    }
 }

@@ -1,8 +1,10 @@
 package com.meteor.app.mono.operator
 
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
+import java.util.concurrent.atomic.AtomicInteger
 
 class MonoOnErrorResumeTest {
     @Test
@@ -130,29 +132,27 @@ class MonoOnErrorResumeTest {
             .verifyComplete()
     }
 
-//    @Test
-//    internal fun onErrorStopTest() {
-//        val message = "testMsg"
-//        val illegalMsg = "illegalMsg"
-//        val onErrorResumeMono = Mono.just(message).map {
-//            throw IllegalArgumentException(illegalMsg)
-////            throw NullPointerException(illegalMsg)
-//            message + "map"
-//        }.onErrorContinue { t, obj ->
-//// obj == ${message}
-//
-//        }.map {
-//            it
-//        }
-//            .onErrorStop()
-//            .map {
-//                //not called
-//                it
-//            }
-//
-//        StepVerifier.create(onErrorResumeMono)
-//            .verifyError()
-//    }
+    @Test
+    internal fun onErrorResumeProcessAndThrowTest() {
+        val atomicInteger = AtomicInteger()
+        val message = "testMsg"
+        val illegalMsg = "illegalMsg"
+        val onErrorResumeMono = Mono.just(message).map {
+            throw IllegalArgumentException(illegalMsg)
+//            throw NullPointerException(illegalMsg)
+            message
+        }.onErrorResume(RuntimeException::class.java) { ex ->
+            Mono.defer {
+                Mono.just(atomicInteger.incrementAndGet())
+            }.flatMap {
+                Mono.error(ex)
+            }
+        }
+        StepVerifier.create(onErrorResumeMono)
+            .verifyError()
+
+        Assertions.assertEquals(1, atomicInteger.get())
+    }
 
     @Test
     internal fun onErrorStopNonContinueTest() {
@@ -164,12 +164,86 @@ class MonoOnErrorResumeTest {
             message
         }.onErrorStop()
             .map {
+                println("!!!@")
                 //not called
                 it
             }
 
         StepVerifier.create(onErrorResumeMono)
             .verifyError()
+    }
+
+    @Test
+    internal fun exceptionOnErrorResumeExceptionTest() {
+        val message = "testMsg"
+        val illegalMsg = "illegalMsg"
+        val onErrorResumeMono = Mono.just(message).map {
+            throw IllegalArgumentException(illegalMsg)
+//            throw NullPointerException(illegalMsg)
+            message
+        }.onErrorResume {
+            Mono.just("retry")
+        }.map {
+            throw IllegalArgumentException(illegalMsg)
+        }
+
+        StepVerifier.create(onErrorResumeMono)
+            .verifyError()
+    }
+
+    @Test
+    internal fun exceptionOnErrorStopOnErrorResumeTest() {
+        val message = "testMsg"
+        val retry = "retry"
+        val illegalMsg = "illegalMsg"
+        val onErrorResumeMono = Mono.just(message).map {
+            throw IllegalArgumentException(illegalMsg)
+//            throw NullPointerException(illegalMsg)
+            message
+        }.onErrorResume {
+            Mono.just(retry)
+        }
+
+        StepVerifier.create(onErrorResumeMono)
+            .expectNext(retry)
+            .verifyComplete()
+    }
+
+    @Test
+    internal fun testZip() {
+
+        val mono1 = Mono.just("test")
+        val mono2 = Mono.empty<String>()
+
+
+        val flatMap = mono1.zipWith(mono2).flatMap<Any> {
+            println("it.t1 : ${it.t1} it.t2 : ${it.t2}")
+            Mono.just(it.t1)
+        }.block()
+
+        println("flatMap : ${flatMap}")
+
+    }
+
+
+    @Test
+    internal fun exceptionOnErrorStopOnErrorContinueTest() {
+        val atomicInteger = AtomicInteger()
+        val message = "testMsg"
+        val illegalMsg = "illegalMsg"
+        val onErrorResumeMono = Mono.just(message).map {
+            throw IllegalArgumentException(illegalMsg)
+//            throw NullPointerException(illegalMsg)
+            message
+        }.onErrorStop()
+            .map {
+                atomicInteger.incrementAndGet()
+            }
+
+        StepVerifier.create(onErrorResumeMono)
+            .verifyError()
+
+        Assertions.assertEquals(0, atomicInteger.get())
     }
 
     @Test
