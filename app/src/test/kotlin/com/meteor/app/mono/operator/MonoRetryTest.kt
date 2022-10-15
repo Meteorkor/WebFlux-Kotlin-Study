@@ -132,8 +132,78 @@ class MonoRetryTest {
             .verifyError()
         Assertions.assertThat(atomicInteger.get()).isEqualTo(1)
     }
-    //TODO .doAfterRetry(
 
+
+    @Test
+    internal fun retryWhenMaxExceptionFilterRetryWorkTest() {
+        val retryCnt = 2L
+        val atomicInteger = AtomicInteger()
+        val num = 3
+        val retryWorkCnt = AtomicInteger()
+
+        val retryMono = Mono.just(num)
+            .map {
+                println(".call {")
+                atomicInteger.incrementAndGet()
+                throw RuntimeException()
+                it
+            }.retryWhen(Retry.max(retryCnt).filter {
+                it is RuntimeException
+//            }.doAfterRetryAsync {
+            }.doBeforeRetryAsync {
+                Mono.defer {
+                    println(".doBeforeRetryAsync {")
+
+                    Mono.just(retryWorkCnt.incrementAndGet())
+                }.then()
+            }.doAfterRetryAsync {
+                Mono.defer {
+                    println(".doAfterRetryAsync {")
+
+                    Mono.just("").then()
+                }
+
+            })
+
+        StepVerifier.create(retryMono)
+            .verifyError()
+        Assertions.assertThat(atomicInteger.get()).isEqualTo(3)
+        Assertions.assertThat(retryWorkCnt.get()).isEqualTo(2)
+
+//                .call {
+//                .doBeforeRetryAsync {
+//                .doAfterRetryAsync {
+//                .call {
+//                .doBeforeRetryAsync {
+//                .doAfterRetryAsync {
+//                .call {
+    }
+
+    @Test
+    internal fun retryWhenMaxExceptionFilterRetryNotWorkTest() {
+        val retryCnt = 2L
+        val atomicInteger = AtomicInteger()
+        val num = 3
+        val retryWorkCnt = AtomicInteger()
+
+        val retryMono = Mono.just(num)
+            .map {
+                atomicInteger.incrementAndGet()
+                throw Exception()
+                it
+            }.retryWhen(Retry.max(retryCnt).filter {
+                it is RuntimeException
+            }.doAfterRetryAsync {
+                Mono.defer {
+                    Mono.just(retryWorkCnt.incrementAndGet())
+                }.then()
+            })
+
+        StepVerifier.create(retryMono)
+            .verifyError()
+        Assertions.assertThat(atomicInteger.get()).isEqualTo(1)
+        Assertions.assertThat(retryWorkCnt.get()).isEqualTo(0)
+    }
 
     @DisplayName("에러 발생시 특정 로직을 처리하고 다시 retry")
     @Test
@@ -161,5 +231,6 @@ class MonoRetryTest {
         Assertions.assertThat(retryCntCheck.get()).isEqualTo(retryCnt.toInt() + 1)
         Assertions.assertThat(onErrorResumeCnt.get()).isEqualTo(retryCnt.toInt() + 1)
     }
+
 
 }
